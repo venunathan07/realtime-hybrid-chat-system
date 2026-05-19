@@ -115,7 +115,7 @@ ZapTalk addresses these challenges through:
 
 > Save your architecture image as `assets/architecture.png` in the repository root.
 
-![ZapTalk Architecture](assets/architecture.png)
+![ZapTalk Architecture](architecture.png)
 
 ### Architecture Highlights
 

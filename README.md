@@ -1,178 +1,337 @@
-ZapTalk
-A Scalable Real-Time Messaging System with WebSocket-Based Delivery
----
-1. Project Overview
-ZapTalk is a high-performance real-time chat system designed to handle low-latency communication, message lifecycle consistency, and scalable group messaging.
-The project focuses on backend engineering concepts such as real-time communication, reliability, and system scalability rather than just UI features.
----
-2. Problem Statement
-Real-time communication systems face multiple challenges:
-High latency in polling-based architectures
-Message duplication due to retries or unstable networks
-Difficulty in tracking message lifecycle (sent → delivered → read)
-Inefficient delivery in group messaging scenarios
-Scalability issues with increasing concurrent users
----
-3. Proposed Solution
-ZapTalk addresses these challenges using:
-WebSocket-based real-time communication
-Message lifecycle tracking system
-Deduplication using client-generated identifiers
-Rate limiting to prevent abuse
-Efficient group message fan-out architecture
----
-4. Key Features
-4.1 Real-Time Messaging
-Instant message delivery using WebSockets
-Typing indicators and live updates
-Real-time communication between multiple users
-4.2 Message Lifecycle
-Sent, delivered, and read tracking
-Synchronization across multiple clients
-Lifecycle consistency across devices
-4.3 Message Management
-Edit messages with timestamps
-Soft delete functionality
-Emoji reactions support
-4.4 Media Support
-Image upload support (JPEG, PNG, GIF, WebP)
-Image preview and storage handling
-Media message delivery
-4.5 Group Chat
-Create and manage groups
-Broadcast messages to multiple users
-Efficient group communication
----
-5. Engineering Highlights
-WebSocket-based architecture eliminates polling overhead and enables real-time bidirectional communication
-Deduplication system using client_message_id ensures idempotent message delivery
-Rate limiting restricts users to prevent spam and backend abuse
-Message lifecycle engine tracks message states and synchronizes them across clients
-Group fan-out logic enables efficient delivery to multiple users
-UUID-based database design supports distributed systems
----
-6. Architecture Diagram
+<div align="center">
 
-The following diagram represents the high-level backend architecture of ZapTalk.
-![Architecture Diagram](output_screenshots/architecture-diagram.png)
+# ⚡ ZapTalk
+
+### A Scalable Real-Time Messaging System with WebSocket-Based Delivery
+
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org)
+[![WebSockets](https://img.shields.io/badge/WebSockets-E8900A?style=flat-square&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
+[![Python](https://img.shields.io/badge/Python_3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
+[![License](https://img.shields.io/badge/License-Academic-green?style=flat-square)](#license)
+
+*Built for backend engineering depth — real-time communication, message reliability, and scalable architecture*
+
+</div>
+
 ---
-7. Logging & Monitoring
-ZapTalk includes backend logging mechanisms to monitor:
-WebSocket connections
-Authentication events
-Message delivery lifecycle
-API request failures
-Rate limit violations
+
+## 📌 Overview
+
+ZapTalk is a high-performance real-time chat system engineered to handle low-latency communication, message lifecycle consistency, and scalable group messaging.
+
+The project focuses on **backend engineering concepts** — real-time communication, reliability, and system scalability — rather than just UI features.
+
 ---
-8. Rate Limiting
-Current rule:
-Maximum 20 messages per minute per user
+
+## 🚀 Highlights
+
+| What | Why It Matters |
+|---|---|
+| ⚡ WebSocket-based messaging | Eliminates polling overhead, enables true real-time bidirectional communication |
+| 🔄 4-stage message lifecycle | Tracks every message from sent → delivered → read with full consistency |
+| 🧠 Deduplication engine | `client_message_id` ensures idempotent delivery across retries and reconnects |
+| 🛡️ Rate limiting | Per-user 20 msg/min cap prevents spam and protects WebSocket infrastructure |
+| 👥 Group fan-out | Efficient broadcast architecture for multi-user delivery |
+| 🔐 JWT + bcrypt security | Industry-standard auth on every REST and WebSocket endpoint |
+
 ---
-9. Saturation Point
-The current architecture is designed for moderate-scale real-time communication workloads.
-Potential bottlenecks:
-WebSocket connection limits
-Database write throughput
-Memory usage for active sessions
-File upload bandwidth
+
+## ❗ Problem Statement
+
+Real-time communication systems face multiple challenges:
+
+- High latency in polling-based architectures
+- Message duplication due to retries or unstable networks
+- Difficulty tracking message lifecycle (sent → delivered → read)
+- Inefficient delivery in group messaging scenarios
+- Scalability issues with increasing concurrent users
+
 ---
-10. Horizontal & Vertical Scaling
-Vertical Scaling
-More CPU
-More RAM
-Faster SSD storage
-Horizontal Scaling
-Multiple backend instances
-Redis Pub/Sub
-Load balancers
-Kubernetes
+
+## ✅ Proposed Solution
+
+ZapTalk addresses these challenges through:
+
+- WebSocket-based real-time communication
+- Message lifecycle tracking system
+- Deduplication via client-generated identifiers
+- Rate limiting to prevent abuse
+- Efficient group message fan-out architecture
+
 ---
-11. How ZapTalk Works
-User connects through WebSocket
-JWT authentication validates the user
-Messages are processed by backend services
-Deduplication prevents duplicate delivery
-Messages are stored in PostgreSQL
-WebSocket manager broadcasts updates
-Clients receive real-time updates instantly
+
+## ✨ Features
+
+<details>
+<summary><strong>⚡ Real-Time Messaging</strong></summary>
+
+- Instant message delivery using WebSockets
+- Typing indicators and live presence updates
+- Real-time communication between multiple users
+
+</details>
+
+<details>
+<summary><strong>📬 Message Lifecycle</strong></summary>
+
+- Sent → Delivered → Read tracking
+- Synchronization across multiple clients
+- Lifecycle consistency across devices
+
+</details>
+
+<details>
+<summary><strong>✏️ Message Management</strong></summary>
+
+- Edit messages with timestamps and `(edited)` tag
+- Soft delete functionality
+- Emoji reactions support
+
+</details>
+
+<details>
+<summary><strong>🖼️ Media Support</strong></summary>
+
+- Image upload (JPEG, PNG, GIF, WebP)
+- Image preview and storage handling
+- Media message delivery
+
+</details>
+
+<details>
+<summary><strong>👥 Group Chat</strong></summary>
+
+- Create and manage groups
+- Broadcast messages to multiple users
+- Efficient group fan-out delivery
+
+</details>
+
 ---
-12. Screenshots
-Architecture Diagram
-![Architecture](output_screenshots/architecture-diagram.png)
-Chat Interface
-![Chat UI](output_screenshots/chat-ui.png)
+
+## 🏗️ Architecture
+
+> Save your architecture image as `assets/architecture.png` in the repository root.
+
+![ZapTalk Architecture](assets/architecture.png)
+
+### Architecture Highlights
+
+| Component | Role |
+|---|---|
+| **Client** | Browser or mobile — sends/receives via WebSocket |
+| **FastAPI Backend** | API routing, auth, message processing, WS handling |
+| **Authentication Layer** | JWT validation on every request |
+| **Message Processing Layer** | Rate limiting, deduplication, lifecycle tracking |
+| **WebSocket Manager** | Connection pool, online tracking, event broadcast |
+| **Media Upload Handler** | File validation, storage, delivery |
+| **PostgreSQL Database** | Persistent storage for all messages, users, groups |
+
 ---
-13. API Documentation
-Authentication APIs
-Method	Endpoint	Description
-POST	/register	Register new user
-POST	/login	User authentication
-Chat APIs
-Method	Endpoint	Description
-GET	/messages	Fetch chat messages
-POST	/messages	Send message
-PUT	/messages/{id}	Edit message
-DELETE	/messages/{id}	Soft delete message
-WebSocket Endpoint
-Protocol	Endpoint
-WebSocket	/ws/chat
+
+## 🔄 Data Flow
+
+```
+1.  User connects to FastAPI backend via WebSocket
+2.  JWT authentication validates the sender
+3.  Rate limiter checks request frequency (max 20/min)
+4.  Deduplication engine checks client_message_id
+5.  Message is stored in PostgreSQL
+6.  ACK is sent back to the sender
+7.  WebSocket Manager broadcasts to recipient(s)
+8.  Message status updated: sent → delivered → read
+9.  All connected clients receive updates in real time
+```
+
 ---
-14. Known Issues / Limitations
-No offline message synchronization
-No push notification support
-Media uploads are stored locally
-Single-region deployment architecture
----
-15. Future Improvements
-Social Features
-User followers and following system
-Public user discovery
-Global chat visibility for registered users
-Improved user connection system
-User Verification
-Profile picture verification
-Email and phone verification
-Identity validation to reduce fake accounts
-Safety Features
-Advanced blocking system
-Permanent block relationship tracking
-Abuse prevention mechanisms
-Content Features
-Stories support
-Short video reels
-Media-rich messaging
-Infrastructure Improvements
-Redis-based distributed WebSocket scaling
-Cloud deployment
-Kubernetes orchestration
-Distributed caching
-Push notifications
-End-to-end encryption
----
-16. Folder Structure
-```bash
+
+## 🗂️ Project Structure
+
+```
 project-root/
 │
 ├── app/
-│   ├── auth/
-│   ├── chat/
-│   ├── core/
-│   ├── db/
-│   ├── models/
-│   ├── websocket/
-│   └── uploads/
+│   ├── auth/               # Authentication and JWT handling
+│   ├── chat/               # Chat APIs and messaging logic
+│   ├── core/               # Core backend utilities
+│   ├── db/                 # Database configuration
+│   ├── models/             # SQLAlchemy database models
+│   ├── websocket/          # Real-time communication layer
+│   └── uploads/            # Uploaded media storage
 │
-├── alembic/
-├── output\_screenshots/
+├── alembic/                # Database migrations
+├── assets/                 # Architecture diagram and screenshots
 ├── main.py
 ├── requirements.txt
 ├── README.md
 └── .gitignore
 ```
+
 ---
-17. License
-This project is developed for academic and learning purposes only.
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Backend Framework** | FastAPI (async Python) |
+| **Database** | PostgreSQL |
+| **ORM** | SQLAlchemy (async) |
+| **Migrations** | Alembic |
+| **Auth** | JWT (`python-jose`) + bcrypt (`passlib`) |
+| **Real-time** | Starlette WebSockets |
+| **Frontend** | Vanilla HTML, CSS, JavaScript |
+| **Server** | Uvicorn (ASGI) |
+
 ---
-18. Author
-Venunathan
-GitHub: https://github.com/venunathan07
+
+## 🔌 API Reference
+
+### Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/register` | Register a new user |
+| `POST` | `/login` | Authenticate and receive JWT token |
+
+### Messaging
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/messages` | Fetch chat messages |
+| `POST` | `/messages` | Send a message |
+| `PUT` | `/messages/{id}` | Edit a message |
+| `DELETE` | `/messages/{id}` | Soft delete a message |
+
+### WebSocket
+
+| Protocol | Endpoint | Description |
+|---|---|---|
+| `WebSocket` | `/ws/chat` | Real-time bidirectional messaging |
+
+---
+
+## 🔐 Security
+
+- JWT-based stateless authentication
+- Password hashing using bcrypt
+- Protected REST and WebSocket endpoints
+- Input validation and access control
+- Per-user rate limiting (20 messages/minute)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Python 3.10+
+- PostgreSQL 14+
+
+### Setup
+
+```bash
+# 1. Clone
+git clone https://github.com/venunathan07/realtime-chat-backend.git
+cd realtime-chat-backend
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Configure environment
+# Create .env file:
+# DATABASE_URL=postgresql://postgres:password@localhost:5432/zaptalk
+# SECRET_KEY=your-secret-key
+
+# 4. Run migrations
+alembic upgrade head
+
+# 5. Start server
+uvicorn main:app --reload
+```
+
+**API Docs →** `http://localhost:8000/docs`
+
+---
+
+## 📈 Scalability
+
+### Current Limitations
+
+| Area | Limitation |
+|---|---|
+| WebSocket | Single-instance only |
+| Media | Stored locally on server |
+| Cache | No distributed layer |
+| Deployment | Single-region |
+
+### Scaling Roadmap
+
+| Solution | Addresses |
+|---|---|
+| Redis Pub/Sub | Multi-server WebSocket sync |
+| Load balancer | Horizontal backend scaling |
+| CDN | Media delivery at scale |
+| Kubernetes | Container orchestration |
+| Database replication | Read throughput |
+
+---
+
+## 📋 Logging & Monitoring
+
+ZapTalk logs the following backend events:
+
+- WebSocket connections and disconnections
+- Authentication successes and failures
+- Message delivery lifecycle transitions
+- API request failures
+- Rate limit violations
+
+**Future:** Prometheus metrics · Grafana dashboards · ELK Stack centralized logging
+
+---
+
+## ⚠️ Known Issues
+
+| Issue | Planned Fix |
+|---|---|
+| WebSocket scaling is single-instance | Redis Pub/Sub |
+| No offline message sync | Service Worker + IndexedDB |
+| Media stored locally | S3 / Cloudflare R2 |
+| No push notifications | Web Push API + VAPID |
+| No distributed cache | Redis integration |
+
+---
+
+## 🗺️ Future Improvements
+
+- [ ] Redis-based distributed WebSocket scaling
+- [ ] Push notifications (Web Push API)
+- [ ] End-to-end encryption
+- [ ] Cloud deployment (AWS / GCP)
+- [ ] Docker Compose setup
+- [ ] Kubernetes orchestration
+- [ ] Email and phone verification
+- [ ] Stories and media-rich messaging
+- [ ] Prometheus + Grafana monitoring
+- [ ] ELK Stack centralized logging
+
+---
+
+## 📄 License
+
+Developed for academic and learning purposes only.
+Not intended for commercial use or redistribution without permission.
+
+---
+
+<div align="center">
+
+Built by **[Venunathan](https://github.com/venunathan07)**
+
+*Backend Developer · Real-Time Systems Enthusiast*
+
+⭐ Star this repo if it helped you learn something
+
+</div>

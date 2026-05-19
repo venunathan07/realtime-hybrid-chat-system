@@ -330,7 +330,6 @@ Not intended for commercial use or redistribution without permission.
 
 Built by **[Venunathan](https://github.com/venunathan07)**
 
-*Backend Developer · Real-Time Systems Enthusiast*
 
 ⭐ Star this repo if it helped you learn something
 

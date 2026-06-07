@@ -21,9 +21,8 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 
     new_user = User(
         username=data.username,
-        username_lower=data.username.lower(),
-        email=data.email or "",          # ✅ save email (optional)
-        password=hashed_password
+        email=data.email or "",
+        hashed_password=hashed_password    # ← fixed (was password=)
     )
 
     db.add(new_user)
@@ -38,7 +37,7 @@ def register(data: RegisterRequest, db: Session = Depends(get_db)):
 def login(data: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.username == data.username).first()
 
-    if not user or not verify_password(data.password, user.password):
+    if not user or not verify_password(data.password, user.hashed_password):  # ← fixed
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     token = create_access_token({"user_id": str(user.id)})
@@ -49,7 +48,7 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     }
 
 
-# 🔹 GET CURRENT USER  ✅ NEW — frontend needs this to get user ID
+# 🔹 GET CURRENT USER
 @router.get("/me")
 def get_me(current_user: User = Depends(get_current_user)):
     return {
@@ -59,7 +58,7 @@ def get_me(current_user: User = Depends(get_current_user)):
     }
 
 
-# 🔹 GET ALL USERS  ✅ NEW — frontend sidebar needs this
+# 🔹 GET ALL USERS
 @router.get("/users")
 def get_users(
     db: Session = Depends(get_db),

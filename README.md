@@ -9,6 +9,7 @@
 [![WebSockets](https://img.shields.io/badge/WebSockets-E8900A?style=flat-square&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API)
 [![Python](https://img.shields.io/badge/Python_3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com)
 [![License](https://img.shields.io/badge/License-Academic-green?style=flat-square)](#license)
 
 *Built for backend engineering depth — real-time communication, message reliability, and scalable architecture*
@@ -35,6 +36,7 @@ The project focuses on **backend engineering concepts** — real-time communicat
 | 🛡️ Rate limiting | Per-user 20 msg/min cap prevents spam and protects WebSocket infrastructure |
 | 👥 Group fan-out | Efficient broadcast architecture for multi-user delivery |
 | 🔐 JWT + bcrypt security | Industry-standard auth on every REST and WebSocket endpoint |
+| 🐳 Dockerized deployment | Full containerization with Docker Compose for one-command setup |
 
 ---
 
@@ -59,6 +61,7 @@ ZapTalk addresses these challenges through:
 - Deduplication via client-generated identifiers
 - Rate limiting to prevent abuse
 - Efficient group message fan-out architecture
+- Docker-based containerization for consistent deployment
 
 ---
 
@@ -109,10 +112,18 @@ ZapTalk addresses these challenges through:
 
 </details>
 
+<details>
+<summary><strong>🐳 Docker Support</strong></summary>
+
+- Fully containerized with Docker and Docker Compose
+- Isolated service environments (app + database)
+- One-command setup for local development and deployment
+
+</details>
+
 ---
 
 ## 🏗️ Architecture
-
 
 ![ZapTalk Architecture](Architecture%20diagram.png)
 
@@ -127,6 +138,7 @@ ZapTalk addresses these challenges through:
 | **WebSocket Manager** | Connection pool, online tracking, event broadcast |
 | **Media Upload Handler** | File validation, storage, delivery |
 | **PostgreSQL Database** | Persistent storage for all messages, users, groups |
+| **Docker** | Containerized app and database services |
 
 ---
 
@@ -162,6 +174,9 @@ project-root/
 │
 ├── alembic/                # Database migrations
 ├── assets/                 # Architecture diagram and screenshots
+├── dockerfile              # Docker image definition
+├── docker-compose.yml      # Multi-container orchestration
+├── .dockerignore           # Docker build exclusions
 ├── main.py
 ├── requirements.txt
 ├── README.md
@@ -182,6 +197,7 @@ project-root/
 | **Real-time** | Starlette WebSockets |
 | **Frontend** | Vanilla HTML, CSS, JavaScript |
 | **Server** | Uvicorn (ASGI) |
+| **Containerization** | Docker + Docker Compose |
 
 ---
 
@@ -225,15 +241,31 @@ project-root/
 
 ### Prerequisites
 
-- Python 3.10+
-- PostgreSQL 14+
+- Docker + Docker Compose (recommended)
+- Python 3.10+ (for manual setup)
+- PostgreSQL 14+ (for manual setup)
 
-### Setup
+### 🐳 Run with Docker (Recommended)
 
 ```bash
 # 1. Clone
-git clone https://github.com/venunathan07/realtime-chat-backend.git
-cd realtime-chat-backend
+git clone https://github.com/venunathan07/realtime-hybrid-chat-system.git
+cd realtime-hybrid-chat-system
+
+# 2. Start all services
+docker-compose up --build
+```
+
+**API Docs →** `http://localhost:8000/docs`
+
+---
+
+### 🔧 Manual Setup
+
+```bash
+# 1. Clone
+git clone https://github.com/venunathan07/realtime-hybrid-chat-system.git
+cd realtime-hybrid-chat-system
 
 # 2. Install dependencies
 pip install -r requirements.txt
@@ -305,11 +337,11 @@ ZapTalk logs the following backend events:
 
 ## 🗺️ Future Improvements
 
+- [x] Docker Compose setup
 - [ ] Redis-based distributed WebSocket scaling
 - [ ] Push notifications (Web Push API)
 - [ ] End-to-end encryption
 - [ ] Cloud deployment (AWS / GCP)
-- [ ] Docker Compose setup
 - [ ] Kubernetes orchestration
 - [ ] Email and phone verification
 - [ ] Stories and media-rich messaging
@@ -328,7 +360,6 @@ Not intended for commercial use or redistribution without permission.
 <div align="center">
 
 Built by **[Venunathan](https://github.com/venunathan07)**
-
 
 ⭐ Star this repo if it helped you learn something
 

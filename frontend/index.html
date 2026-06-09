@@ -651,7 +651,8 @@ const obs = new IntersectionObserver(es => { es.forEach((e,i) => { if (e.isInter
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 
 /* ── APP LOGIC (unchanged) ─────────────────────────────────────────── */
-const API="http://localhost:8000", WS="ws://localhost:8000";
+const API=window.location.origin;
+const WS=window.location.origin.replace("https","wss").replace("http","ws");
 let token=localStorage.getItem("ZapTalk_token")||null;
 let myId=localStorage.getItem("ZapTalk_userId")||null;
 let myName=localStorage.getItem("ZapTalk_username")||null;

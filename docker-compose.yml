@@ -34,7 +34,6 @@ services:
         condition: service_healthy
     volumes:
       - ./uploads:/app/uploads
-      - ./frontend:/app/frontend
     command: >
       sh -c "alembic downgrade base &&
              alembic upgrade head &&

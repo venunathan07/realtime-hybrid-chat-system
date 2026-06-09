@@ -1027,7 +1027,7 @@ function handleEnt(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMs
 function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
 
 (async()=>{
-  if(token&&myId){try{await loadMe();enterApp();}catch{["ZapTalk_token","ZapTalk_userId","ZapTalk_username"].forEach(k=>localStorage.removeItem(k));}}
+  if(token&&myId){try{await loadMe();enterApp();}catch{["ZapTalk_token","ZapTalk_userId","ZapTalk_username"].forEach(k=>localStorage.removeItem(k));location.reload();}}
 })();
 </script>
 </body>

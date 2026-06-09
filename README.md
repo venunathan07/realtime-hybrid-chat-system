@@ -37,6 +37,7 @@ The project focuses on **backend engineering concepts** — real-time communicat
 | 👥 Group fan-out | Efficient broadcast architecture for multi-user delivery |
 | 🔐 JWT + bcrypt security | Industry-standard auth on every REST and WebSocket endpoint |
 | 🐳 Dockerized deployment | Full containerization with Docker Compose for one-command setup |
+| 📶 Offline message queue | localStorage queue with auto-flush on reconnect |
 
 ---
 
@@ -49,6 +50,7 @@ Real-time communication systems face multiple challenges:
 - Difficulty tracking message lifecycle (sent → delivered → read)
 - Inefficient delivery in group messaging scenarios
 - Scalability issues with increasing concurrent users
+- Message loss during temporary network disconnections
 
 ---
 
@@ -62,6 +64,7 @@ ZapTalk addresses these challenges through:
 - Rate limiting to prevent abuse
 - Efficient group message fan-out architecture
 - Docker-based containerization for consistent deployment
+- Offline queue via localStorage with auto-flush on reconnect
 
 ---
 
@@ -99,7 +102,7 @@ ZapTalk addresses these challenges through:
 
 - Image upload (JPEG, PNG, GIF, WebP)
 - Image preview and storage handling
-- Media message delivery
+- Media message delivery and deletion
 
 </details>
 
@@ -113,10 +116,20 @@ ZapTalk addresses these challenges through:
 </details>
 
 <details>
+<summary><strong>📶 Offline Support</strong></summary>
+
+- Messages queued in localStorage when offline
+- Auto-flush on WebSocket reconnect
+- Deduplication prevents duplicate sends on retry
+
+</details>
+
+<details>
 <summary><strong>🐳 Docker Support</strong></summary>
 
 - Fully containerized with Docker and Docker Compose
 - Isolated service environments (app + database)
+- Automated database migrations on container startup
 - One-command setup for local development and deployment
 
 </details>
@@ -125,20 +138,20 @@ ZapTalk addresses these challenges through:
 
 ## 🏗️ Architecture
 
-![ZapTalk Architecture](Architecture%20diagram.png)
+![ZapTalk Architecture](architecture-diagram.png)
 
 ### Architecture Highlights
 
 | Component | Role |
 |---|---|
-| **Client** | Browser or mobile — sends/receives via WebSocket |
+| **Client** | Browser — sends/receives via WebSocket, queues offline messages |
 | **FastAPI Backend** | API routing, auth, message processing, WS handling |
-| **Authentication Layer** | JWT validation on every request |
+| **Authentication Layer** | JWT validation on every request and WebSocket connection |
 | **Message Processing Layer** | Rate limiting, deduplication, lifecycle tracking |
 | **WebSocket Manager** | Connection pool, online tracking, event broadcast |
 | **Media Upload Handler** | File validation, storage, delivery |
 | **PostgreSQL Database** | Persistent storage for all messages, users, groups |
-| **Docker** | Containerized app and database services |
+| **Docker Compose** | Orchestrates app + database containers with health checks |
 
 ---
 
@@ -154,6 +167,7 @@ ZapTalk addresses these challenges through:
 7.  WebSocket Manager broadcasts to recipient(s)
 8.  Message status updated: sent → delivered → read
 9.  All connected clients receive updates in real time
+10. If offline, message is queued in localStorage and auto-sent on reconnect
 ```
 
 ---
@@ -161,23 +175,30 @@ ZapTalk addresses these challenges through:
 ## 🗂️ Project Structure
 
 ```
-project-root/
+realtime-hybrid-chat-system/
 │
 ├── app/
-│   ├── auth/               # Authentication and JWT handling
-│   ├── chat/               # Chat APIs and messaging logic
-│   ├── core/               # Core backend utilities
-│   ├── db/                 # Database configuration
-│   ├── models/             # SQLAlchemy database models
-│   ├── websocket/          # Real-time communication layer
-│   └── uploads/            # Uploaded media storage
+│   ├── auth/               # Authentication, JWT, bcrypt
+│   │   ├── routes.py
+│   │   ├── jwt_handler.py
+│   │   ├── hashing.py
+│   │   └── schemas.py
+│   ├── chat/               # Chat APIs, WebSocket, messaging logic
+│   │   ├── routes.py
+│   │   └── websocket.py
+│   ├── core/               # Rate limiter and core utilities
+│   ├── db/                 # Database session and base config
+│   └── models/             # SQLAlchemy models (User, Message, Group)
 │
 ├── alembic/                # Database migrations
-├── assets/                 # Architecture diagram and screenshots
+│   └── versions/
+├── frontend/               # Vanilla HTML/CSS/JS chat UI
+│   └── index.html
 ├── dockerfile              # Docker image definition
 ├── docker-compose.yml      # Multi-container orchestration
 ├── .dockerignore           # Docker build exclusions
-├── main.py
+├── .env.example            # Environment variable template
+├── main.py                 # FastAPI app entry point
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -191,7 +212,7 @@ project-root/
 |---|---|
 | **Backend Framework** | FastAPI (async Python) |
 | **Database** | PostgreSQL |
-| **ORM** | SQLAlchemy (async) |
+| **ORM** | SQLAlchemy |
 | **Migrations** | Alembic |
 | **Auth** | JWT (`python-jose`) + bcrypt (`passlib`) |
 | **Real-time** | Starlette WebSockets |
@@ -207,23 +228,39 @@ project-root/
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/register` | Register a new user |
-| `POST` | `/login` | Authenticate and receive JWT token |
+| `POST` | `/auth/register` | Register a new user |
+| `POST` | `/auth/login` | Authenticate and receive JWT token |
+| `GET` | `/auth/me` | Get current authenticated user |
+| `GET` | `/auth/users` | List all users |
 
 ### Messaging
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/messages` | Fetch chat messages |
-| `POST` | `/messages` | Send a message |
-| `PUT` | `/messages/{id}` | Edit a message |
-| `DELETE` | `/messages/{id}` | Soft delete a message |
+| `POST` | `/chat/start/{user_id}` | Start or get a conversation |
+| `GET` | `/chat/messages/{conv_id}` | Fetch chat history |
+| `POST` | `/chat/upload` | Upload an image |
+| `POST` | `/chat/read/{conv_id}` | Mark messages as read |
 
 ### WebSocket
 
 | Protocol | Endpoint | Description |
 |---|---|---|
-| `WebSocket` | `/ws/chat` | Real-time bidirectional messaging |
+| `WebSocket` | `/chat/ws/{user_id}` | Real-time bidirectional messaging |
+
+### WebSocket Event Types
+
+| Event | Direction | Description |
+|---|---|---|
+| `message` | Both | Send/receive a chat message |
+| `typing` | Client → Server | Typing indicator |
+| `reaction` | Client → Server | Emoji reaction on a message |
+| `edit` | Client → Server | Edit a sent message |
+| `delete` | Client → Server | Delete a message |
+| `read` | Client → Server | Mark messages as read |
+| `ack` | Server → Client | Message delivery confirmation |
+| `status_update` | Server → Client | Tick status update |
+| `online_status` | Server → Client | User online/offline update |
 
 ---
 
@@ -241,26 +278,32 @@ project-root/
 
 ### Prerequisites
 
-- Docker + Docker Compose (recommended)
-- Python 3.10+ (for manual setup)
-- PostgreSQL 14+ (for manual setup)
+- [Docker Desktop](https://www.docker.com/products/docker-desktop) (recommended)
+- Git
 
 ### 🐳 Run with Docker (Recommended)
 
 ```bash
-# 1. Clone
+# 1. Clone the repo
 git clone https://github.com/venunathan07/realtime-hybrid-chat-system.git
 cd realtime-hybrid-chat-system
 
-# 2. Start all services
+# 2. Copy environment variables
+cp .env.example .env
+
+# 3. Start all services (app + database)
 docker-compose up --build
 ```
 
+**Chat UI →** `http://localhost:8000`
+
 **API Docs →** `http://localhost:8000/docs`
+
+> Database migrations run automatically on container startup.
 
 ---
 
-### 🔧 Manual Setup
+### 🔧 Manual Setup (Without Docker)
 
 ```bash
 # 1. Clone
@@ -271,9 +314,8 @@ cd realtime-hybrid-chat-system
 pip install -r requirements.txt
 
 # 3. Configure environment
-# Create .env file:
-# DATABASE_URL=postgresql://postgres:password@localhost:5432/zaptalk
-# SECRET_KEY=your-secret-key
+cp .env.example .env
+# Edit .env with your local PostgreSQL credentials
 
 # 4. Run migrations
 alembic upgrade head
@@ -281,6 +323,8 @@ alembic upgrade head
 # 5. Start server
 uvicorn main:app --reload
 ```
+
+**Chat UI →** `http://localhost:8000`
 
 **API Docs →** `http://localhost:8000/docs`
 
@@ -325,28 +369,29 @@ ZapTalk logs the following backend events:
 
 ## ⚠️ Known Issues
 
-| Issue | Planned Fix |
-|---|---|
-| WebSocket scaling is single-instance | Redis Pub/Sub |
-| No offline message sync | Service Worker + IndexedDB |
-| Media stored locally | S3 / Cloudflare R2 |
-| No push notifications | Web Push API + VAPID |
-| No distributed cache | Redis integration |
+| Issue | Status | Planned Fix |
+|---|---|---|
+| WebSocket scaling is single-instance | Open | Redis Pub/Sub |
+| Media stored locally | Open | S3 / Cloudflare R2 |
+| No push notifications | Open | Web Push API + VAPID |
+| No distributed cache | Open | Redis integration |
 
 ---
 
 ## 🗺️ Future Improvements
 
 - [x] Docker Compose setup
+- [x] Offline message queue (localStorage + auto-flush)
+- [x] Image upload and deletion
+- [x] Emoji reactions
+- [x] Message edit and soft delete
 - [ ] Redis-based distributed WebSocket scaling
 - [ ] Push notifications (Web Push API)
 - [ ] End-to-end encryption
-- [ ] Cloud deployment (AWS / GCP)
+- [ ] Cloud deployment (Railway / AWS)
 - [ ] Kubernetes orchestration
 - [ ] Email and phone verification
-- [ ] Stories and media-rich messaging
 - [ ] Prometheus + Grafana monitoring
-- [ ] ELK Stack centralized logging
 
 ---
 

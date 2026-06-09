@@ -144,7 +144,7 @@ ZapTalk addresses these challenges through:
 
 ## 🏗️ Architecture
 
-![ZapTalk Architecture](architecture-diagram.png)
+![ZapTalk Architecture](Architecture-diagram.png)
 
 ### Architecture Highlights
 

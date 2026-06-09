@@ -10,9 +10,14 @@
 [![Python](https://img.shields.io/badge/Python_3.10+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)](https://www.sqlalchemy.org)
 [![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white)](https://www.docker.com)
+[![Render](https://img.shields.io/badge/Deployed_on-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://zaptalk-kt8y.onrender.com)
 [![License](https://img.shields.io/badge/License-Academic-green?style=flat-square)](#license)
 
 *Built for backend engineering depth — real-time communication, message reliability, and scalable architecture*
+
+### 🌐 [Live Demo → https://zaptalk-kt8y.onrender.com](https://zaptalk-kt8y.onrender.com)
+
+> ⚠️ Free tier — first load may take 30-50 seconds to wake up
 
 </div>
 
@@ -37,6 +42,7 @@ The project focuses on **backend engineering concepts** — real-time communicat
 | 👥 Group fan-out | Efficient broadcast architecture for multi-user delivery |
 | 🔐 JWT + bcrypt security | Industry-standard auth on every REST and WebSocket endpoint |
 | 🐳 Dockerized deployment | Full containerization with Docker Compose for one-command setup |
+| ☁️ Cloud deployed | Live on Render with PostgreSQL — accessible from anywhere |
 | 📶 Offline message queue | localStorage queue with auto-flush on reconnect |
 
 ---
@@ -219,6 +225,7 @@ realtime-hybrid-chat-system/
 | **Frontend** | Vanilla HTML, CSS, JavaScript |
 | **Server** | Uvicorn (ASGI) |
 | **Containerization** | Docker + Docker Compose |
+| **Cloud Deployment** | Render |
 
 ---
 
@@ -353,20 +360,6 @@ uvicorn main:app --reload
 
 ---
 
-## 📋 Logging & Monitoring
-
-ZapTalk logs the following backend events:
-
-- WebSocket connections and disconnections
-- Authentication successes and failures
-- Message delivery lifecycle transitions
-- API request failures
-- Rate limit violations
-
-**Future:** Prometheus metrics · Grafana dashboards · ELK Stack centralized logging
-
----
-
 ## ⚠️ Known Issues
 
 | Issue | Status | Planned Fix |
@@ -375,12 +368,14 @@ ZapTalk logs the following backend events:
 | Media stored locally | Open | S3 / Cloudflare R2 |
 | No push notifications | Open | Web Push API + VAPID |
 | No distributed cache | Open | Redis integration |
+| Free tier spins down after inactivity | Open | Upgrade to paid tier |
 
 ---
 
 ## 🗺️ Future Improvements
 
 - [x] Docker Compose setup
+- [x] Cloud deployment (Render)
 - [x] Offline message queue (localStorage + auto-flush)
 - [x] Image upload and deletion
 - [x] Emoji reactions
@@ -388,9 +383,8 @@ ZapTalk logs the following backend events:
 - [ ] Redis-based distributed WebSocket scaling
 - [ ] Push notifications (Web Push API)
 - [ ] End-to-end encryption
-- [ ] Cloud deployment (Railway / AWS)
+- [ ] Image storage on S3 / Cloudflare R2
 - [ ] Kubernetes orchestration
-- [ ] Email and phone verification
 - [ ] Prometheus + Grafana monitoring
 
 ---
@@ -405,6 +399,8 @@ Not intended for commercial use or redistribution without permission.
 <div align="center">
 
 Built by **[Venunathan](https://github.com/venunathan07)**
+
+🌐 **Live Demo:** [https://zaptalk-kt8y.onrender.com](https://zaptalk-kt8y.onrender.com)
 
 ⭐ Star this repo if it helped you learn something
 
